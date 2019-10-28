@@ -42,7 +42,8 @@ LeavingDate    :
 Manager        :
 EmailId        : test@gmail.com
 FirstName      : Tomáš
-EmploymentType : Employment Contract-unlimited period, FTE             Title          : Mr
+EmploymentType : Employment Contract-unlimited period, FTE
+Title          : Mr
 Company        : Topdev s.r.o.
 Location       : Brno, CZ
 EmployeeId     : CZ_111
