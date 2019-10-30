@@ -103,6 +103,90 @@ function Update-PhrEmployee {
         $Email,
 
         [Parameter(Mandatory = $false)]
+        [ValidateLength(1, 100)]
+        [string]
+        $Title,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        [ValidateLength(1, 50)]
+        $FirstName,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        [ValidateLength(1, 50)]
+        $LastName,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        [ValidateSet('Female', 'Male')]
+        $Gender,
+
+        [Parameter(Mandatory = $false)]
+        [DateTime]
+        $DateOfBirth,
+
+        [Parameter(Mandatory = $false)]
+        [DateTime]
+        $StartDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ReportsTo,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]
+        $ReportsToEffectiveDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $Company,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]
+        $CompanyEffectiveDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $JobRole,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]
+        $JobRoleEffectiveDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $Location,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]
+        $LocationEffectiveDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $Department,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]
+        $DepartmentEffectiveDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $EmploymentType,
+
+        [Parameter(Mandatory = $true)]
+        [DateTime]
+        $EmploymentTypeEffectiveDate,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $Address,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $PersonalPhoneNumber,
+
+        [Parameter(Mandatory = $false)]
         [string]
         $APIColumn1
     )
@@ -113,14 +197,97 @@ function Update-PhrEmployee {
             "EmployeeId"      = $Id;
         }
 
-        if ($Email) { $parameters += @{ "Email" = $Email } 
+        if ($Email) { $parameters += @{ "Email" = $Email }  }
+        if ($Title) { $parameters += @{ "Title" = $Title } }
+        if ($FirstName) { $parameters += @{ "FirstName" = $FirstName } }
+        if ($LastName) { $parameters += @{ "LastName" = $LastName } }
+        if ($Gender) { $parameters += @{ "Gender" = $Gender } }
+        if ($Address) { $parameters += @{ "Address" = $Address } }
+        if ($PersonalPhoneNumber) { $parameters += @{ "PersonalPhoneNumber" = $PersonalPhoneNumber }}
+
+        if (Test-EffectiveDateDependancy -Parameter $Company -EffectiveDate $CompanyEffectiveDate) {
+            $parameters += @{ "CompanyEffectiveDate" = ('{0:yyyy-MM-dd}' -f $CompanyEffectiveDate) }
+            $parameters += @{ "Company" = $Company } 
         }
 
-        if ($APIColumn1) { $parameters += @{ "APIColumn1" = $APIColumn1 }
+        if (Test-EffectiveDateDependancy -Parameter $JobRole -EffectiveDate $JobRoleEffectiveDate) { 
+            $parameters += @{ "JobRoleEffectiveDate" = ('{0:yyyy-MM-dd}' -f $JobRoleEffectiveDate) }
+            $parameters += @{ "JobRole" = $JobRole } 
         }
+
+        if (Test-EffectiveDateDependancy -Parameter $Location -EffectiveDate $LocationEffectiveDate) { 
+            $parameters += @{ "LocationEffectiveDate" = ('{0:yyyy-MM-dd}' -f $LocationEffectiveDate) }
+            $parameters += @{ "Location" = $Location } 
+        }
+
+        if (Test-EffectiveDateDependancy -Parameter $Department -EffectiveDate $DepartmentEffectiveDate) { 
+            $parameters += @{ "DepartmentEffectiveDate" = ('{0:yyyy-MM-dd}' -f $DepartmentEffectiveDate) }
+            $parameters += @{ "Department" = $Department } 
+        }
+
+        if (Test-EffectiveDateDependancy -Parameter $EmploymentType -EffectiveDate $EmploymentTypeEffectiveDate) { 
+            $parameters += @{ "EmploymentTypeEffectiveDate" = ('{0:yyyy-MM-dd}' -f $EmploymentTypeEffectiveDate) }
+            $parameters += @{ "EmploymentType" = $EmploymentType } 
+        }
+        
+        if ($DateOfBirth) { $parameters += @{ "DateOfBirth" = ('{0:yyyy-MM-dd}' -f $DateOfBirth) } }
+        if ($StartDate) { $parameters += @{ "StartDate" = ('{0:yyyy-MM-dd}' -f $StartDate) } }
+        if ($ReportsToEffectiveDate) { $parameters += @{ "ReportsToEffectiveDate" = ('{0:yyyy-MM-dd}' -f $ReportsToEffectiveDate) } }
+        if ($APIColumn1) { $parameters += @{ "APIColumn1" = $APIColumn1 } }
+        if ($ReportsTo) { $parameters += @{ "ReportsTo" = $ReportsTo } }
 
         if ($PSCmdlet.ShouldProcess($Id, "Update")) {
             Invoke-PhrMethod -Endpoint "Employee" -ActionName "UpdateEmployeeDetail" -Parameters $parameters
+        }
+    }
+}
+function Update-PhrEmployeeId {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $OldId,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $NewId,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $ReasonForChange
+    )
+    
+    process {
+        $parameters = @{
+            "ReasonForChange" = $ReasonForChange;
+            "OldEmployeeId" = $OldId;
+            "NewEmployeeId" = $NewId;
+        }
+
+        if ($PSCmdlet.ShouldProcess($OldId, "Update Employee ID")) {
+            Invoke-PhrMethod -Endpoint "Employee" -ActionName "UpdateEmployeeId" -Parameters $parameters
+        }
+    }
+}
+function Test-Authentication {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $EmailAddress,
+
+        [Parameter(Mandatory = $true)]
+        [SecureString]
+        $Password
+    )
+
+    process {
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
+        $unsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
+
+        Invoke-PhrMethod -Endpoint "Employee" -ActionName "CheckAuthentication" -Parameters @{
+            "EmailAddress" = $EmailAddress
+            "Password" = $unsecurePassword
         }
     }
 }
@@ -163,6 +330,34 @@ function Set-PhrConfigServer {
 #endregion Public
 
 #region Private
+
+function Test-EffectiveDateDependancy
+{
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]
+        [AllowNull()]
+        $Parameter,
+
+        [Parameter(Mandatory = $true)]
+        [datetime]
+        [AllowNull()]
+        $EffectiveDate
+    )
+
+    process {
+        if ($Parameter) {
+            if (!$EffectiveDate) {
+                Write-Error "Missing parameter: Effective Date" -ErrorAction Stop
+            }
+        } else {
+            return $false
+        }
+
+        return $true
+    }
+}
+
 function Invoke-PhrMethod {
     [CmdletBinding()]
     param(
