@@ -1,5 +1,5 @@
 [![GitHub release](https://img.shields.io/github/release/tomaspavlic/people-hr.svg?style=for-the-badge)](https://github.com/tomaspavlic/people-hr/releases/latest)
-[![PowerShell Gallery](https://img.shields.io/nuget/dt/PeopleHR?style=for-the-badge)](https://www.powershellgallery.com/packages/JiraPS)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PeopleHR.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/JiraPS)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)
 
 # [PeopleHR]([https://](https://github.com/tomaspavlic/people-hr))
