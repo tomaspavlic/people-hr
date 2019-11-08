@@ -51,6 +51,7 @@ function Get-PhrEmployee {
                     Location    = $obj.Location.DisplayValue
                     APIColumn1  = $obj.APIColumn1
                     LeavingDate = if ($obj.LeavingDate -ne "") { (Get-Date $obj.LeavingDate) } else { $null }
+                    StartDate   = if ($obj.StartDate -ne "") { (Get-Date $obj.StartDate) } else { $null }
                     EmploymentType = $obj.EmploymentType.DisplayValue
                 }
             }
