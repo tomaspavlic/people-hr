@@ -135,7 +135,7 @@ function Update-PhrEmployee {
         [string]
         $ReportsTo,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [DateTime]
         $ReportsToEffectiveDate,
 
@@ -143,7 +143,7 @@ function Update-PhrEmployee {
         [string]
         $Company,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [DateTime]
         $CompanyEffectiveDate,
 
@@ -151,7 +151,7 @@ function Update-PhrEmployee {
         [string]
         $JobRole,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [DateTime]
         $JobRoleEffectiveDate,
 
@@ -159,7 +159,7 @@ function Update-PhrEmployee {
         [string]
         $Location,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [DateTime]
         $LocationEffectiveDate,
 
@@ -167,7 +167,7 @@ function Update-PhrEmployee {
         [string]
         $Department,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [DateTime]
         $DepartmentEffectiveDate,
 
@@ -175,7 +175,7 @@ function Update-PhrEmployee {
         [string]
         $EmploymentType,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [DateTime]
         $EmploymentTypeEffectiveDate,
 
@@ -328,6 +328,112 @@ function Set-PhrConfigServer {
         Write-Verbose "[$($MyInvocation.MyCommand.Name)] Complete"
     }
 }
+function Get-PhrOtherEvent {
+    [CmdletBinding()]
+    param(
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [string]
+        $EmployeeId,
+
+        [Parameter(
+            Position = 1,
+            Mandatory = $true
+        )]
+        [string]
+        $Start,
+
+        [Parameter(
+            Position = 2,
+            Mandatory = $true
+        )]
+        [string]
+        $End
+    )
+
+    $params = @{}
+    $actionName = "GetOtherEventDetail"
+
+    $params.Add("EmployeeId", $EmployeeId)
+    $params.Add("StartDate", $Start)
+    $params.Add("EndDate", $End)
+
+    Invoke-PhrMethod -Endpoint "OtherEvent" -ActionName $actionName -Parameters $params -ErrorAction Stop
+}
+
+function New-PhrOtherEvent {
+    [CmdletBinding()]
+    param(
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [string]
+        $EmployeeId,
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [string]
+        $Start,
+
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [string]
+        $End,
+        
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [string]
+        $DurationInDays,
+
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [string]
+        $Reason,
+
+        [Parameter(
+            Position = 0,
+            Mandatory = $true
+        )]
+        [ValidateSet("Days", "Hours")]
+        [string]
+        $DurationType,
+
+        [Parameter(
+            Position = 0,
+            Mandatory = $false
+        )]
+        [string]
+        $Comment
+    )
+
+    $params = @{}
+    $actionName = "AddOtherEventLeave" #addothereventleave
+    $durationTypeId = if ($DurationType -eq "Days") { "1" } else { "2" }
+
+    $params.Add("EmployeeId", $EmployeeId)
+    $params.Add("StartDate", $Start)
+    $params.Add("EndDate", $End)
+    $params.Add("DurationInDays", $durationInDays)
+    $params.Add("Other Event Reason", $Reason)
+    $params.Add("DurationType", $durationTypeId)
+
+    if ($Comment -ne $null) {
+        $params.Add("Comments", $Comment)
+    }
+
+    Invoke-PhrMethod -Endpoint "OtherEvent" -ActionName $actionName -Parameters $params -ErrorAction Stop
+}
+
 #endregion Public
 
 #region Private
@@ -341,7 +447,7 @@ function Test-EffectiveDateDependancy
         $Parameter,
 
         [Parameter(Mandatory = $true)]
-        [datetime]
+        [object]
         [AllowNull()]
         $EffectiveDate
     )
